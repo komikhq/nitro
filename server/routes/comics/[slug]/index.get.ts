@@ -1,7 +1,7 @@
 import { defineHandler, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
-import { ComicService } from "@/server/services/comic.service";
+import { findComicBySlug } from "@/server/operations/comics";
 
 export default defineHandler(async (event) => {
   const slug = event.context.params?.slug;
@@ -12,9 +12,8 @@ export default defineHandler(async (event) => {
 
   const db = useDb(event);
   const env = useCloudflareEnv(event);
-  const service = new ComicService(db, env);
 
-  const comic = await service.getComicBySlug(slug);
+  const comic = await findComicBySlug(db, slug, env);
 
   if (!comic) {
     throw new HTTPError({ status: 404, message: "Comic not found." });

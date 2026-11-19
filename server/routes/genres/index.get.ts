@@ -1,12 +1,10 @@
 import { defineHandler } from "nitro";
 import { useDb } from "@/server/utils/db";
-import { GenreService } from "@/server/services/genre.service";
+import { findGenreMany } from "@/server/operations/genres";
 
 export default defineHandler(async (event) => {
   const db = useDb(event);
-  const service = new GenreService(db);
-
-  const genres = await service.getAllGenres();
+  const genres = await findGenreMany(db);
 
   return {
     status: "ok",

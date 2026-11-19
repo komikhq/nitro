@@ -2,7 +2,7 @@ import { defineHandler } from "nitro";
 import { getQuery } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
-import { ComicService } from "@/server/services/comic.service";
+import { findComicMany } from "@/server/operations/comics";
 
 export default defineHandler(async (event) => {
   const query = getQuery(event);
@@ -12,13 +12,16 @@ export default defineHandler(async (event) => {
 
   const db = useDb(event);
   const env = useCloudflareEnv(event);
-  const service = new ComicService(db, env);
 
-  const data = await service.listComics({
-    q: q || undefined,
-    page,
-    limit,
-  });
+  const data = await findComicMany(
+    db,
+    {
+      q: q || undefined,
+      page,
+      limit,
+    },
+    env,
+  );
 
   return {
     status: "ok",

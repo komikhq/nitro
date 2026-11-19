@@ -1,6 +1,5 @@
 import { genres, type DbClient } from "@/server/db";
 import type { Genre } from "@/server/db/schema/genres";
-import { eq } from "drizzle-orm";
 
 const genreNameCollator = new Intl.Collator("en", {
   numeric: true,
@@ -19,16 +18,7 @@ export function sortGenres<T extends Pick<Genre, "id" | "name" | "slug">>(genreL
   return [...genreList].sort(compareGenreNames);
 }
 
-export class GenreRepository {
-  constructor(private db: DbClient) {}
-
-  async findAll() {
-    const genreList = await this.db.select().from(genres);
-    return sortGenres(genreList);
-  }
-
-  async findBySlug(slug: string) {
-    const [genre] = await this.db.select().from(genres).where(eq(genres.slug, slug));
-    return genre || null;
-  }
+export async function findGenreMany(db: DbClient) {
+  const genreList = await db.select().from(genres);
+  return sortGenres(genreList);
 }

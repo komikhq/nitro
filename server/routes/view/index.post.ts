@@ -1,7 +1,7 @@
 import { defineHandler, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
-import { ViewService } from "@/server/services/view.service";
+import { recordView } from "@/server/operations/views";
 import { ViewRecordSchema } from "@/server/schemas";
 
 export default defineHandler(async (event) => {
@@ -13,9 +13,7 @@ export default defineHandler(async (event) => {
   }
 
   const env = useCloudflareEnv(event);
-  const service = new ViewService(env);
-
-  await service.recordView(parsed.data.comicId, parsed.data.chapterId);
+  await recordView(env, parsed.data.comicId, parsed.data.chapterId);
 
   return {
     status: "ok",

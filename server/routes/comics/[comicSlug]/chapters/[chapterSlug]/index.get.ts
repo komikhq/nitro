@@ -1,7 +1,7 @@
 import { defineHandler, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
-import { ChapterService } from "@/server/services/chapter.service";
+import { findChapterReaderPages } from "@/server/operations/chapters";
 
 export default defineHandler(async (event) => {
   const comicSlug = event.context.params?.comicSlug;
@@ -13,9 +13,8 @@ export default defineHandler(async (event) => {
 
   const db = useDb(event);
   const env = useCloudflareEnv(event);
-  const service = new ChapterService(db, env);
 
-  const chapterData = await service.getChapterPages(comicSlug, chapterSlug);
+  const chapterData = await findChapterReaderPages(db, comicSlug, chapterSlug, env);
 
   if (!chapterData) {
     throw new HTTPError({ status: 404, message: "Chapter not found." });

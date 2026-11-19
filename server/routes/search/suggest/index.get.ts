@@ -2,7 +2,7 @@ import { defineHandler } from "nitro";
 import { getQuery } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
-import { ComicSearchService } from "@/server/services/comic-search.service";
+import { findSearchSuggestions } from "@/server/operations/search";
 
 export default defineHandler(async (event) => {
   const query = getQuery(event);
@@ -18,9 +18,8 @@ export default defineHandler(async (event) => {
 
   const db = useDb(event);
   const env = useCloudflareEnv(event);
-  const service = new ComicSearchService(db, env);
 
-  const suggestions = await service.getSuggestions(q, limit);
+  const suggestions = await findSearchSuggestions(db, q, limit, env);
 
   return {
     status: "ok",
