@@ -1,0 +1,23 @@
+# KomikHQ Nitro API - Local Development Secrets Template
+# Copy this file to .dev.vars for Wrangler / Miniflare local development
+
+# PostgreSQL Database (Neon serverless with SSL)
+DATABASE_URL="postgresql://user:password@ep-branch-name.c-4.ap-southeast-1.aws.neon.tech/komikhq?sslmode=require"
+
+# Better Auth Credentials
+BETTER_AUTH_SECRET="your-32-byte-secret-string-here-min-32-chars"
+BETTER_AUTH_URL="http://localhost:3000"
+
+# Google OAuth Credentials
+GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="GOCSPX-your-google-client-secret"
+
+# Cloudflare R2 Public Storage Domains (CDN URLs)
+BUCKET_URL_USERS="https://cdn-01.komikhq.dpdns.org"
+BUCKET_URL_MEDIA="https://cdn-02.komikhq.dpdns.org"
+
+# Email Provider Configuration (resend | brevo | cloudflare)
+EMAIL_PROVIDER="resend"
+EMAIL_FROM="KomikHQ <no-reply@komikhq.com>"
+RESEND_API_KEY="re_123456789_example"
+BREVO_API_KEY="xkeysib-123456789_example"

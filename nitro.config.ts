@@ -12,6 +12,37 @@ export default defineConfig({
   },
   experimental: {
     tasks: true,
+    openAPI: true,
+  },
+  openAPI: {
+    meta: {
+      title: "KomikHQ API",
+      description: "Official REST and Realtime WebSocket API for KomikHQ Platform",
+      version: "1.0.0",
+    },
+    production: "runtime",
+    route: "/_openapi.json",
+    ui: {
+      scalar: {
+        route: "/docs",
+      },
+      swagger: {
+        route: "/swagger",
+      },
+    },
+  },
+  runtimeConfig: {
+    databaseUrl: "",
+    betterAuthSecret: "",
+    betterAuthUrl: "https://api.komikhq.dpdns.org",
+    googleClientId: "",
+    googleClientSecret: "",
+    bucketUrlUsers: "https://cdn-01.komikhq.dpdns.org",
+    bucketUrlMedia: "https://cdn-02.komikhq.dpdns.org",
+    emailProvider: "resend",
+    emailFrom: "KomikHQ <no-reply@komikhq.com>",
+    resendApiKey: "",
+    brevoApiKey: "",
   },
   scheduledTasks: {
     "0 * * * *": ["rankings:refresh"],
@@ -19,8 +50,5 @@ export default defineConfig({
   },
   cloudflare: {
     nodeCompat: true,
-    wrangler: {
-      compatibility_flags: ["nodejs_compat"],
-    },
   },
 });
