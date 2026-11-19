@@ -18,5 +18,6 @@ export default defineMiddleware((event) => {
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposeHeaders: ["Content-Length", "Content-Range", "Set-Cookie"],
   });
 });
