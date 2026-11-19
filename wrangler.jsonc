@@ -2,13 +2,15 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "komikhq-nitro",
   "compatibility_date": "2026-09-05",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "workers_dev": true,
   "preview_urls": true,
   "keep_vars": true,
   "routes": [
     {
-      "pattern": "api.komikhq.dpdns.org",
+      "pattern": "nitro.komikhq.dpdns.org",
       "custom_domain": true
     }
   ],
@@ -39,7 +41,10 @@
     }
   ],
   "triggers": {
-    "crons": ["0 * * * *", "0 */6 * * *"]
+    "crons": [
+      "0 * * * *",
+      "0 */6 * * *"
+    ]
   },
   "durable_objects": {
     "bindings": [
@@ -56,7 +61,10 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["GlobalPresenceDO", "CommentStreamDO"]
+      "new_sqlite_classes": [
+        "GlobalPresenceDO",
+        "CommentStreamDO"
+      ]
     }
   ],
   "observability": {
