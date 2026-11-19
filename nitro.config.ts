@@ -10,6 +10,13 @@ export default defineConfig({
     "@": fileURLToPath(new URL("./", import.meta.url)),
     "~": fileURLToPath(new URL("./", import.meta.url)),
   },
+  experimental: {
+    tasks: true,
+  },
+  scheduledTasks: {
+    "0 * * * *": ["rankings:refresh"],
+    "0 */6 * * *": ["views:sync-delta", "rankings:refresh"],
+  },
   cloudflare: {
     nodeCompat: true,
     wrangler: {
