@@ -1,7 +1,21 @@
-import { defineHandler } from "nitro";
+import { defineHandler, defineRouteMeta } from "nitro";
 import { sql } from "drizzle-orm";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Health"],
+    operationId: "getHealthStatus",
+    summary: "Service health check",
+    description: "Returns database latency and Cloudflare resource binding connectivity status.",
+    responses: {
+      200: {
+        description: "Health status details.",
+      },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const env = useCloudflareEnv(event);
