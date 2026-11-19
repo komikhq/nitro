@@ -1,9 +1,37 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { useAuth } from "@/server/utils/auth";
 import { requireUser } from "@/server/utils/protect";
 import { deleteUserSelf, type DeleteUserSelfParams } from "@/server/operations/users";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Users"],
+    operationId: "deleteOwnAccount",
+    summary: "Delete own account",
+    description: "Permanently deletes the authenticated user's account with confirmation password or matching email.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              password: { type: "string", description: "Required if account has credential password" },
+              email: { type: "string", description: "Required if account is OAuth-only" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Account deleted successfully." },
+      400: { description: "Verification failed." },
+      401: { description: "Unauthorized." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const sessionUser = requireUser(event);

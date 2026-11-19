@@ -1,8 +1,25 @@
-import { defineHandler } from "nitro";
+import { defineHandler, defineRouteMeta } from "nitro";
 import { getQuery } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { findComicMany } from "@/server/operations/comics";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Search"],
+    operationId: "searchComics",
+    summary: "Full text comic search",
+    description: "Searches comics across titles, alternate titles, and slugs with pagination.",
+    parameters: [
+      { name: "q", in: "query", schema: { type: "string" }, description: "Search query" },
+      { name: "page", in: "query", schema: { type: "integer", default: 1 } },
+      { name: "limit", in: "query", schema: { type: "integer", default: 20 } },
+    ],
+    responses: {
+      200: { description: "Search results list." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const query = getQuery(event);

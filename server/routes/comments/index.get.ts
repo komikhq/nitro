@@ -1,8 +1,25 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { getQuery } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { findCommentMany } from "@/server/operations/comments";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Comments"],
+    operationId: "listComments",
+    summary: "List comments for comic or chapter",
+    description: "Returns nested threaded comments with like states and author information.",
+    parameters: [
+      { name: "comicId", in: "query", required: true, schema: { type: "string", format: "uuid" }, description: "Comic ID" },
+      { name: "chapterId", in: "query", schema: { type: "string", format: "uuid" }, description: "Optional chapter ID filter" },
+    ],
+    responses: {
+      200: { description: "Comments thread list." },
+      400: { description: "comicId is missing." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const query = getQuery(event);

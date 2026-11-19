@@ -1,9 +1,42 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { requireUser } from "@/server/utils/protect";
 import { upsertHistoryProgress } from "@/server/operations/history";
 import { HistoryUpsertSchema } from "@/server/schemas";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Reading History"],
+    operationId: "recordReadingHistory",
+    summary: "Record chapter reading progress",
+    description: "Saves or updates reading progress, last read page, and completion status for a comic chapter.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["comicId", "chapterId"],
+            properties: {
+              comicId: { type: "string", format: "uuid" },
+              chapterId: { type: "string", format: "uuid" },
+              lastReadPage: { type: "integer", default: 1 },
+              snapshotTotalPages: { type: "integer" },
+              isCompleted: { type: "boolean", default: false },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Reading progress recorded successfully." },
+      400: { description: "Invalid payload." },
+      401: { description: "Unauthorized." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const user = requireUser(event);

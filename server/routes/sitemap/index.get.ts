@@ -1,7 +1,24 @@
-import { defineHandler } from "nitro";
+import { defineHandler, defineRouteMeta } from "nitro";
 import { appendHeader } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { comics } from "@/server/db";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Sitemaps"],
+    operationId: "getComicSitemapXml",
+    summary: "XML sitemap generator",
+    description: "Generates dynamic XML sitemap of all indexed comics for search engine bots.",
+    responses: {
+      200: {
+        description: "XML sitemap content.",
+        content: {
+          "application/xml": {},
+        },
+      },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   appendHeader(event, "Content-Type", "application/xml; charset=utf-8");

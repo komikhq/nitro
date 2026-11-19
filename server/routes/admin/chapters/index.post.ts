@@ -1,8 +1,43 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { requireAdmin } from "@/server/utils/protect";
 import { createChapter, type CreateChapterParams } from "@/server/operations/admin";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Administration"],
+    operationId: "adminCreateChapter",
+    summary: "Create comic chapter",
+    description: "Inserts a new comic chapter into the database. Requires administrator privileges.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["comicId", "chapterNumber", "slug"],
+            properties: {
+              comicId: { type: "string", format: "uuid" },
+              chapterNumber: { type: "string" },
+              title: { type: "string" },
+              slug: { type: "string" },
+              accessTier: { type: "string", default: "free" },
+              isEarlyAccess: { type: "boolean", default: false },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Chapter created successfully." },
+      400: { description: "Invalid input." },
+      401: { description: "Unauthorized." },
+      403: { description: "Forbidden." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   requireAdmin(event);

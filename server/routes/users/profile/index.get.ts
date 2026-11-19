@@ -1,8 +1,22 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { requireUser } from "@/server/utils/protect";
 import { findUserProfile } from "@/server/operations/users";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Users"],
+    operationId: "getUserProfile",
+    summary: "Get current user profile",
+    description: "Returns profile details and credential password status for the authenticated user.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    responses: {
+      200: { description: "User profile retrieved successfully." },
+      401: { description: "Unauthorized." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const sessionUser = requireUser(event);

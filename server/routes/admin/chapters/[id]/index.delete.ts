@@ -1,7 +1,26 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
 import { requireAdmin } from "@/server/utils/protect";
 import { deleteChapterById } from "@/server/operations/admin";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Administration"],
+    operationId: "adminDeleteChapter",
+    summary: "Delete chapter by ID",
+    description: "Permanently deletes a chapter record and its pages from the database. Requires administrator privileges.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    parameters: [
+      { name: "id", in: "path", required: true, schema: { type: "string" }, description: "Chapter ID" },
+    ],
+    responses: {
+      200: { description: "Chapter deleted successfully." },
+      401: { description: "Unauthorized." },
+      403: { description: "Forbidden." },
+      404: { description: "Chapter not found." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   requireAdmin(event);

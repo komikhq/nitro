@@ -1,8 +1,41 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { requireAdmin } from "@/server/utils/protect";
 import { updateGenreById } from "@/server/operations/admin";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Administration"],
+    operationId: "adminUpdateGenre",
+    summary: "Update genre by ID",
+    description: "Modifies genre name, slug, or description. Requires administrator privileges.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    parameters: [
+      { name: "id", in: "path", required: true, schema: { type: "string" }, description: "Genre ID" },
+    ],
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              slug: { type: "string" },
+              description: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Genre updated successfully." },
+      401: { description: "Unauthorized." },
+      403: { description: "Forbidden." },
+      404: { description: "Genre not found." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   requireAdmin(event);

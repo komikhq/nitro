@@ -1,6 +1,23 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { getQuery, getHeader } from "nitro/h3";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Realtime"],
+    operationId: "connectRealtimeWebSocket",
+    summary: "Connect to realtime WebSocket stream",
+    description: "Upgrades the connection to a WebSocket for global presence or chapter comment streams using Cloudflare Durable Objects.",
+    parameters: [
+      { name: "channel", in: "query", schema: { type: "string", default: "global_presence" }, description: "Channel name (e.g. global_presence or comment_stream:<id>)" },
+      { name: "Upgrade", in: "header", required: true, schema: { type: "string", default: "websocket" } },
+    ],
+    responses: {
+      101: { description: "Switching protocols to WebSocket." },
+      400: { description: "Invalid channel or missing Upgrade header." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const query = getQuery(event);

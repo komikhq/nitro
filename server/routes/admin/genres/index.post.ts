@@ -1,8 +1,40 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { requireAdmin } from "@/server/utils/protect";
 import { createGenre } from "@/server/operations/admin";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Administration"],
+    operationId: "adminCreateGenre",
+    summary: "Create a new genre",
+    description: "Inserts a new comic genre into the database. Requires administrator privileges.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["name", "slug"],
+            properties: {
+              name: { type: "string" },
+              slug: { type: "string" },
+              description: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Genre created successfully." },
+      400: { description: "Invalid input." },
+      401: { description: "Unauthorized." },
+      403: { description: "Forbidden." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   requireAdmin(event);

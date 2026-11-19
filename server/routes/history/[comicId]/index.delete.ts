@@ -1,7 +1,25 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
 import { requireUser } from "@/server/utils/protect";
 import { deleteHistoryByComic } from "@/server/operations/history";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Reading History"],
+    operationId: "deleteReadingHistory",
+    summary: "Clear reading history for comic",
+    description: "Removes reading history records for a specific comic.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    parameters: [
+      { name: "comicId", in: "path", required: true, schema: { type: "string" }, description: "Comic ID" },
+    ],
+    responses: {
+      200: { description: "Reading history deleted successfully." },
+      401: { description: "Unauthorized." },
+      404: { description: "Not found." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const user = requireUser(event);

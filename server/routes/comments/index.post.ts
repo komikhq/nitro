@@ -1,8 +1,41 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { createComment } from "@/server/operations/comments";
 import { CommentCreateSchema } from "@/server/schemas";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Comments"],
+    operationId: "createComment",
+    summary: "Post a comment or reply",
+    description: "Posts a new comment or nested reply for a comic or specific chapter.",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["comicId", "content"],
+            properties: {
+              comicId: { type: "string", format: "uuid" },
+              chapterId: { type: "string", format: "uuid" },
+              content: { type: "string", minLength: 1 },
+              isSpoiler: { type: "boolean", default: false },
+              parentId: { type: "string", format: "uuid" },
+              guestName: { type: "string" },
+              guestEmail: { type: "string", format: "email" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Comment created successfully." },
+      400: { description: "Invalid payload." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const body = await readBody(event);

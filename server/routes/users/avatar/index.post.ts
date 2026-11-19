@@ -1,10 +1,39 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readFormData } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { requireUser } from "@/server/utils/protect";
 import { updateUserAvatar } from "@/server/operations/users";
 import type { StorageEnv } from "@/server/lib/storage";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Users"],
+    operationId: "uploadUserAvatar",
+    summary: "Upload profile avatar image",
+    description: "Uploads an image file to R2 storage and updates the user's avatar URL.",
+    security: [{ SessionCookie: [] }, { BearerToken: [] }],
+    requestBody: {
+      required: true,
+      content: {
+        "multipart/form-data": {
+          schema: {
+            type: "object",
+            required: ["file"],
+            properties: {
+              file: { type: "string", format: "binary", description: "Image file to upload" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Avatar updated successfully." },
+      400: { description: "Invalid file." },
+      401: { description: "Unauthorized." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const sessionUser = requireUser(event);

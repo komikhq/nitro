@@ -1,8 +1,41 @@
-import { defineHandler, HTTPError } from "nitro";
+import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { readBody } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { createCommentReport } from "@/server/operations/comments";
 import { CommentReportSchema } from "@/server/schemas";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Comments"],
+    operationId: "reportComment",
+    summary: "Report an inappropriate comment",
+    description: "Submits a moderation report for a comment with a specific violation reason.",
+    parameters: [
+      { name: "id", in: "path", required: true, schema: { type: "string" }, description: "Comment ID" },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["reason"],
+            properties: {
+              reason: { type: "string", enum: ["spam", "harassment", "hate_speech", "inappropriate", "spoiler", "other"] },
+              details: { type: "string" },
+              reporterGuestName: { type: "string" },
+              reporterGuestEmail: { type: "string", format: "email" },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Report submitted." },
+      400: { description: "Invalid payload." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const commentId = event.context.params?.id;

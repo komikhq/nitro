@@ -1,8 +1,23 @@
-import { defineHandler } from "nitro";
+import { defineHandler, defineRouteMeta } from "nitro";
 import { getQuery } from "nitro/h3";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { findComicTrending } from "@/server/operations/comics";
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["Comics"],
+    operationId: "getTrendingComics",
+    summary: "Get trending comics",
+    description: "Returns a list of trending and popular comics ranked by views.",
+    parameters: [
+      { name: "limit", in: "query", schema: { type: "integer", default: 10 }, description: "Max comics to return (max 50)" },
+    ],
+    responses: {
+      200: { description: "Trending comics list." },
+    },
+  },
+});
 
 export default defineHandler(async (event) => {
   const query = getQuery(event);
