@@ -18,7 +18,7 @@ let _authEnvSignature: string | null = null;
  * Lazily initializes with Drizzle adapter and dynamic environment values.
  */
 export function useAuth(event?: H3Event) {
-  const env = event ? useCloudflareEnv(event) : ((globalThis as any).__env__ || (process.env as any));
+  const env = useCloudflareEnv(event);
   const db = useDb(event);
 
   const databaseUrl = env?.DATABASE_URL || process.env.DATABASE_URL || "";
@@ -87,6 +87,13 @@ export function useAuth(event?: H3Event) {
         sameSite: "lax",
         secure: true,
         httpOnly: true,
+      },
+      ipAddress: {
+        ipAddressHeaders: ["cf-connecting-ip", "x-real-ip", "x-forwarded-for"],
+      },
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google", "discord", "facebook"],
       },
     },
     databaseHooks: {

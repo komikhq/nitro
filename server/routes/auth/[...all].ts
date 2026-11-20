@@ -19,21 +19,26 @@ export default defineHandler(async (event) => {
   try {
     const auth = useAuth(event);
 
-    // Construct a proper WHATWG Request from the H3 event.
-    // On Cloudflare Workers, event.req (TypedServerRequest) may not carry
-    // an absolute URL, which Better Auth's handler requires.
-    const url = getRequestURL(event);
-    const method = event.method;
-    const headers = event.headers;
-    const body = ["GET", "HEAD"].includes(method)
-      ? undefined
-      : await readRawBody(event);
+    // In Nitro Cloudflare preset, event.web?.request provides the native WHATWG Request.
+    // If available with an absolute URL, use it directly; otherwise construct one from H3 event.
+    const nativeRequest = (event.web as any)?.request;
+    let request: Request;
+    if (nativeRequest instanceof Request && nativeRequest.url.startsWith("http")) {
+      request = nativeRequest;
+    } else {
+      const url = getRequestURL(event);
+      const method = event.method;
+      const headers = event.headers;
+      const body = ["GET", "HEAD"].includes(method)
+        ? undefined
+        : await readRawBody(event);
 
-    const request = new Request(url.href, {
-      method,
-      headers,
-      body,
-    });
+      request = new Request(url.href, {
+        method,
+        headers,
+        body,
+      });
+    }
 
     return await auth.handler(request);
   } catch (error: any) {

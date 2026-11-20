@@ -1,10 +1,22 @@
 import type { H3Event } from "nitro/h3";
 
 /**
- * Access typed Cloudflare bindings from H3Event runtime context
+ * Access typed Cloudflare bindings from H3Event runtime context.
+ * Safely resolves bindings across Nitro v2, Nitro v3, and Cloudflare Worker module standards.
  */
-export function useCloudflareEnv(event: H3Event): CloudflareBindings {
-  const env = (event.runtime as any)?.cloudflare?.env || (globalThis as any).__env__ || (process.env as any);
+export function useCloudflareEnv(event?: H3Event): CloudflareBindings {
+  if (!event) {
+    return ((globalThis as any).__env__ || (process.env as any)) as CloudflareBindings;
+  }
+
+  const env =
+    (event.context as any)?.cloudflare?.env ||
+    (event as any)?.runtime?.cloudflare?.env ||
+    (event as any)?.req?.runtime?.cloudflare?.env ||
+    (event.context as any)?.env ||
+    (globalThis as any).__env__ ||
+    (process.env as any);
+
   return env as CloudflareBindings;
 }
 
@@ -12,7 +24,11 @@ export function useCloudflareEnv(event: H3Event): CloudflareBindings {
  * Access Cloudflare ExecutionContext (for waitUntil)
  */
 export function useCloudflareContext(event: H3Event): ExecutionContext | undefined {
-  return (event.runtime as any)?.cloudflare?.context;
+  return (
+    (event.context as any)?.cloudflare?.context ||
+    (event as any)?.runtime?.cloudflare?.context ||
+    (event as any)?.req?.runtime?.cloudflare?.context
+  );
 }
 
 /**

@@ -12,7 +12,7 @@ export async function sendEmail(
   options: SendEmailOptions,
   event?: H3Event,
 ): Promise<boolean> {
-  const env = event ? useCloudflareEnv(event) : ((globalThis as any).__env__ || (process.env as any));
+  const env = useCloudflareEnv(event);
   const provider = env?.EMAIL_PROVIDER || process.env.EMAIL_PROVIDER || "resend";
   const from = env?.EMAIL_FROM || process.env.EMAIL_FROM || "KomikHQ <no-reply@komikhq.com>";
 

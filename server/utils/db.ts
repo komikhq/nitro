@@ -13,7 +13,7 @@ let _currentDbUrl: string | null = null;
  * Resolves DATABASE_URL from Nitro event context, Cloudflare bindings, or process.env.
  */
 export function useDb(event?: H3Event): DbClient {
-  const env = event ? useCloudflareEnv(event) : ((globalThis as any).__env__ || (process.env as any));
+  const env = useCloudflareEnv(event);
   const databaseUrl = env?.DATABASE_URL || process.env.DATABASE_URL;
 
   if (!databaseUrl) {
