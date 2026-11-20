@@ -25,6 +25,7 @@ defineRouteMeta({
       content: {
         "application/json": {
           schema: {
+            title: "AdminUpdateComicJsonRequest",
             type: "object",
             properties: {
               title: { type: "string" },
@@ -41,6 +42,7 @@ defineRouteMeta({
         },
         "multipart/form-data": {
           schema: {
+            title: "AdminUpdateComicFormDataRequest",
             type: "object",
             properties: {
               title: { type: "string" },
