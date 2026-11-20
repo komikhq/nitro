@@ -208,6 +208,11 @@ defineRouteMeta({
     responses: {
       200: {
         description: "Welcome message.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/SuccessResponse" },
+          },
+        },
       },
     },
   },

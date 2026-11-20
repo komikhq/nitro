@@ -1,5 +1,7 @@
 import { defineHandler, defineRouteMeta } from "nitro";
 import { sql } from "drizzle-orm";
+import { Buffer } from "node:buffer";
+import crypto from "node:crypto";
 import { useDb } from "@/server/utils/db";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
 
@@ -7,11 +9,11 @@ defineRouteMeta({
   openAPI: {
     tags: ["Health"],
     operationId: "getHealthStatus",
-    summary: "Service health check",
-    description: "Returns database latency and Cloudflare resource binding connectivity status.",
+    summary: "Service health and runtime environment check",
+    description: "Returns database latency, Node.js runtime compatibility, and Cloudflare resource binding connectivity status.",
     responses: {
       200: {
-        description: "Health status details.",
+        description: "Health and environment diagnostic details.",
         content: {
           "application/json": {
             schema: {
@@ -26,12 +28,24 @@ defineRouteMeta({
                     latencyMs: { type: "number", nullable: true },
                   },
                 },
-                services: {
+                bindings: {
                   type: "object",
                   properties: {
-                    kv: { type: "boolean" },
-                    analytics: { type: "boolean" },
-                    r2: { type: "boolean" },
+                    hasKvKomikhq: { type: "boolean" },
+                    hasKvViews: { type: "boolean" },
+                    hasBucketUsers: { type: "boolean" },
+                    hasBucketMedia: { type: "boolean" },
+                    hasAeViews: { type: "boolean" },
+                    hasGlobalPresenceDO: { type: "boolean" },
+                    hasCommentStreamDO: { type: "boolean" },
+                  },
+                },
+                nodeCompat: {
+                  type: "object",
+                  properties: {
+                    bufferBase64: { type: "string" },
+                    sha256: { type: "string" },
+                    isNodeProcessAvailable: { type: "boolean" },
                   },
                 },
               },
@@ -58,6 +72,10 @@ export default defineHandler(async (event) => {
     dbStatus = `disconnected (${err?.message || "error"})`;
   }
 
+  // Node.js crypto & Buffer compatibility verification on Workers runtime
+  const testBuffer = Buffer.from("komikhq-nitro-workers", "utf-8").toString("base64");
+  const testHash = crypto.createHash("sha256").update("komikhq-test").digest("hex");
+
   return {
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -71,6 +89,13 @@ export default defineHandler(async (event) => {
       hasBucketUsers: Boolean(env?.BUCKET_USERS),
       hasBucketMedia: Boolean(env?.BUCKET_MEDIA),
       hasAeViews: Boolean(env?.AE_COMIC_VIEWS),
+      hasGlobalPresenceDO: Boolean(env?.GLOBAL_PRESENCE_DO),
+      hasCommentStreamDO: Boolean(env?.COMMENT_STREAM_DO),
+    },
+    nodeCompat: {
+      bufferBase64: testBuffer,
+      sha256: testHash,
+      isNodeProcessAvailable: typeof process !== "undefined" && typeof process.cwd === "function",
     },
   };
 });
