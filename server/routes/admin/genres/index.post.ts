@@ -64,12 +64,20 @@ export default defineHandler(async (event) => {
     description?: string;
   } | null;
 
-  if (!body || !body.name || !body.slug) {
-    throw new HTTPError({ status: 400, message: "Name and slug are required." });
+  if (!body || !body.name) {
+    throw new HTTPError({ status: 400, message: "Name is required." });
   }
 
+  const slug =
+    body.slug?.trim() ||
+    body.name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
   const db = useDb(event);
-  const genre = await createGenre(db, body.name, body.slug, body.description);
+  const genre = await createGenre(db, body.name, slug, body.description);
 
   return {
     status: "ok",

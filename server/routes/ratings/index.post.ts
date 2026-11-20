@@ -76,6 +76,9 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
+    success: true,
     data: rating,
+    rating,
+    score: parsed.data.score,
   };
 });

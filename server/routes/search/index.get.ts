@@ -45,7 +45,7 @@ defineRouteMeta({
 
 export default defineHandler(async (event) => {
   const query = getQuery(event);
-  const q = String(query.q || "").trim();
+  const q = String(query.q || query.search || "").trim();
   const page = Math.max(Number(query.page) || 1, 1);
   const limit = Math.min(Number(query.limit) || 20, 50);
 
@@ -65,6 +65,7 @@ export default defineHandler(async (event) => {
   return {
     status: "ok",
     data: data.comics,
+    comics: data.comics,
     pagination: {
       page: data.page,
       limit: data.limit,

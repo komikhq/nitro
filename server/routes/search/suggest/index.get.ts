@@ -64,5 +64,7 @@ export default defineHandler(async (event) => {
   return {
     status: "ok",
     data: suggestions,
+    suggestions,
+    query: q,
   };
 });

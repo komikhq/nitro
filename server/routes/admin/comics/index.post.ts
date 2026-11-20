@@ -10,7 +10,7 @@ import {
   slugify,
   type CreateComicParams,
 } from "@/server/operations/admin";
-import type { StorageEnv } from "@/server/lib/storage";
+import { toPublicUrl, type StorageEnv } from "@/server/lib/storage";
 
 defineRouteMeta({
   openAPI: {

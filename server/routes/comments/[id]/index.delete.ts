@@ -56,6 +56,7 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
+    success: true,
     message: "Comment deleted successfully.",
   };
 });

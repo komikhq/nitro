@@ -57,13 +57,20 @@ defineRouteMeta({
 export default defineHandler(async (event) => {
   requireAdmin(event);
   const query = getQuery(event);
-  const status = (query.status as string) || "PENDING";
+  const status = (query.status as string) || undefined;
+  const page = query.page ? Number(query.page) : 1;
+  const limit = query.limit ? Number(query.limit) : 20;
 
   const db = useDb(event);
-  const reports = await findReportMany(db, status);
+  const result = await findReportMany(db, status, page, limit);
 
   return {
     status: "ok",
-    data: reports,
+    success: true,
+    data: result,
+    reports: result.reports,
+    total: result.total,
+    page: result.page,
+    limit: result.limit,
   };
 });

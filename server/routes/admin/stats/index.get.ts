@@ -48,6 +48,8 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
+    success: true,
     data: stats,
+    ...stats,
   };
 });

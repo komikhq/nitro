@@ -62,7 +62,7 @@ export default defineHandler(async (event) => {
   const data = await findComicMany(
     db,
     {
-      q: query.q as string | undefined,
+      q: (query.q || query.search) as string | undefined,
       genre: filters.genre,
       status: filters.status,
       type: filters.type,
@@ -85,6 +85,7 @@ export default defineHandler(async (event) => {
         totalPages: data.totalPages,
       },
     },
+    comics: data.comics,
     pagination: {
       page: data.page,
       limit: data.limit,

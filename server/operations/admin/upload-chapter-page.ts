@@ -10,12 +10,19 @@ export interface UploadChapterPageParams {
   height?: number;
 }
 
-function getExtFromContentType(ct: string): string {
-  if (ct.includes("webp")) return "webp";
-  if (ct.includes("png")) return "png";
-  if (ct.includes("gif")) return "gif";
-  if (ct.includes("avif")) return "avif";
-  return "jpg";
+function getExt(file: File): string {
+  if (file.type) {
+    if (file.type.includes("webp")) return "webp";
+    if (file.type.includes("png")) return "png";
+    if (file.type.includes("gif")) return "gif";
+    if (file.type.includes("avif")) return "avif";
+    if (file.type.includes("jpeg") || file.type.includes("jpg")) return "jpg";
+  }
+  const nameExt = file.name?.split(".").pop()?.toLowerCase();
+  if (nameExt && nameExt !== "blob" && ["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(nameExt)) {
+    return nameExt === "jpeg" ? "jpg" : nameExt;
+  }
+  return "webp";
 }
 
 export async function uploadChapterPage(
@@ -48,7 +55,7 @@ export async function uploadChapterPage(
     throw new Error("Parent comic not found.");
   }
 
-  const ext = getExtFromContentType(params.file.type || "");
+  const ext = getExt(params.file);
   const objectKey = `comics/${comic.slug}/ch-${chapter.chapterNumber}/page-${params.pageNumber}-${Date.now()}.${ext}`;
   const buffer = await params.file.arrayBuffer();
 

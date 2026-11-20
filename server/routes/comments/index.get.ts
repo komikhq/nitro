@@ -69,5 +69,6 @@ export default defineHandler(async (event) => {
   return {
     status: "ok",
     data: comments,
+    comments,
   };
 });

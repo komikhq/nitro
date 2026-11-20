@@ -1,8 +1,10 @@
 import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
 import { requireAdmin } from "@/server/utils/protect";
-import { chapters } from "@/server/db";
-import { eq, asc } from "drizzle-orm";
+import { chapters, comics } from "@/server/db";
+import { eq, asc, or } from "drizzle-orm";
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 defineRouteMeta({
   openAPI: {
@@ -62,10 +64,31 @@ export default defineHandler(async (event) => {
   }
 
   const db = useDb(event);
+
+  const isUuid = UUID_REGEX.test(comicId);
+  const comicCondition = isUuid
+    ? or(eq(comics.id, comicId), eq(comics.slug, comicId))
+    : eq(comics.slug, comicId);
+
+  const [comic] = await db
+    .select({ id: comics.id })
+    .from(comics)
+    .where(comicCondition);
+
+  const resolvedComicId = comic ? comic.id : (isUuid ? comicId : null);
+  if (!resolvedComicId) {
+    return {
+      status: "ok",
+      success: true,
+      data: [],
+      chapters: [],
+    };
+  }
+
   const chapterList = await db
     .select()
     .from(chapters)
-    .where(eq(chapters.comicId, comicId))
+    .where(eq(chapters.comicId, resolvedComicId))
     .orderBy(asc(chapters.chapterNumber));
 
   return {

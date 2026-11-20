@@ -66,6 +66,8 @@ export default defineHandler(async (event) => {
     const user = await createUser(auth, db, body);
     return {
       status: "ok",
+      success: true,
+      user,
       data: user,
     };
   } catch (err: any) {
