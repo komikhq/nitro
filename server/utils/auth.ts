@@ -52,6 +52,7 @@ export function useAuth(event?: H3Event) {
         session: schema.sessions,
         account: schema.accounts,
         verification: schema.verifications,
+        jwks: schema.jwks,
       },
     }),
     user: {

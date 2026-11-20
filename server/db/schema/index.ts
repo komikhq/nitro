@@ -2,6 +2,7 @@ export * from "./users";
 export * from "./sessions";
 export * from "./accounts";
 export * from "./verifications";
+export * from "./jwks";
 export * from "./genres";
 export * from "./comics";
 export * from "./comic-genres";
