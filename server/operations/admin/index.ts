@@ -13,3 +13,8 @@ export * from "./update-user-by-id";
 export * from "./delete-user-by-id";
 export * from "./find-system-health";
 export * from "./purge-storage-orphans";
+export * from "./initialize-chapter";
+export * from "./update-chapter-by-id";
+export * from "./finalize-chapter";
+export * from "./upload-chapter-page";
+export * from "./upload-comic-media";
