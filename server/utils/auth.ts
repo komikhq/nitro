@@ -51,6 +51,8 @@ export function useAuth(event?: H3Event) {
       "http://localhost:5173",
       "http://localhost:4321",
       "http://localhost:3000",
+      "komikhq://",
+      "exp://",
     ],
     advanced: {
       cookiePrefix: "komikhq",
@@ -72,7 +74,7 @@ export function useAuth(event?: H3Event) {
           before: async (user) => {
             if (!user.image) return;
             const isExternalAvatar =
-              /googleusercontent\.com|ggpht\.com|google\.com/i.test(user.image) ||
+              /googleusercontent\.com|ggpht\.com|google\.com|discordapp\.com|cdn\.discordapp\.com|fbcdn\.net|facebook\.com/i.test(user.image) ||
               (user.image.startsWith("http") &&
                 Boolean(env?.BUCKET_URL_USERS) &&
                 !user.image.includes(env?.BUCKET_URL_USERS!));
@@ -84,12 +86,12 @@ export function useAuth(event?: H3Event) {
                   const contentType = res.headers.get("content-type") || "image/jpeg";
                   const ext = contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
                   const arrayBuffer = await res.arrayBuffer();
-                  const objectKey = `avatars/google-${user.id || Date.now()}.${ext}`;
+                  const objectKey = `avatars/oauth-${user.id || Date.now()}.${ext}`;
                   const imageKey = await uploadToR2(env as StorageEnv, "users", objectKey, arrayBuffer, { contentType });
                   return { data: { ...user, image: imageKey } };
                 }
               } catch (e) {
-                console.error("[Auth] Failed to mirror Google avatar to R2:", e);
+                console.error("[Auth] Failed to mirror external OAuth avatar to R2:", e);
               }
             }
             return;
@@ -137,7 +139,33 @@ export function useAuth(event?: H3Event) {
         accessType: "offline",
         scope: ["openid", "profile", "email"],
         mapProfileToUser: async (profile) => ({
-          image: profile.picture || (profile as any).avatar_url || null,
+          image: profile.picture || (profile as any).avatar_url || undefined,
+        }),
+      },
+      discord: {
+        clientId: (env as any)?.DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "",
+        clientSecret: (env as any)?.DISCORD_CLIENT_SECRET || process.env.DISCORD_CLIENT_SECRET || "",
+        enabled: Boolean(
+          ((env as any)?.DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID) &&
+          ((env as any)?.DISCORD_CLIENT_SECRET || process.env.DISCORD_CLIENT_SECRET)
+        ),
+        scope: ["identify", "email"],
+        mapProfileToUser: async (profile: any) => ({
+          image: profile.avatar
+            ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
+            : undefined,
+        }),
+      },
+      facebook: {
+        clientId: (env as any)?.FACEBOOK_CLIENT_ID || process.env.FACEBOOK_CLIENT_ID || "",
+        clientSecret: (env as any)?.FACEBOOK_CLIENT_SECRET || process.env.FACEBOOK_CLIENT_SECRET || "",
+        enabled: Boolean(
+          ((env as any)?.FACEBOOK_CLIENT_ID || process.env.FACEBOOK_CLIENT_ID) &&
+          ((env as any)?.FACEBOOK_CLIENT_SECRET || process.env.FACEBOOK_CLIENT_SECRET)
+        ),
+        scope: ["email", "public_profile"],
+        mapProfileToUser: async (profile: any) => ({
+          image: profile.picture?.data?.url || profile.avatar_url || undefined,
         }),
       },
     },
