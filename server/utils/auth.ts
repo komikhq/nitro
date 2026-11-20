@@ -24,6 +24,19 @@ export function useAuth(event?: H3Event) {
   const env = event ? useCloudflareEnv(event) : ((globalThis as any).__env__ || (process.env as any));
   const db = useDb(event);
 
+  const baseUrl =
+    env?.BETTER_AUTH_URL ||
+    process.env.BETTER_AUTH_URL ||
+    "https://api.komikhq.com";
+
+  const cookieDomain = baseUrl.includes("localhost")
+    ? undefined
+    : baseUrl.includes("komikhq.com")
+    ? ".komikhq.com"
+    : baseUrl.includes("komikhq.dpdns.org")
+    ? ".komikhq.dpdns.org"
+    : undefined;
+
   _authInstance = betterAuth({
     database: drizzleAdapter(db, {
       provider: "pg",
@@ -41,11 +54,12 @@ export function useAuth(event?: H3Event) {
       },
     },
     secret: env?.BETTER_AUTH_SECRET || process.env.BETTER_AUTH_SECRET || "default_secret_for_dev_min_32_characters",
-    baseURL: env?.BETTER_AUTH_URL || process.env.BETTER_AUTH_URL || "https://nitro.komikhq.dpdns.org",
+    baseURL: baseUrl,
     basePath: "/auth", // No /v1, No /api prefix
     trustedOrigins: [
       "https://komikhq.com",
       "https://www.komikhq.com",
+      "https://api.komikhq.com",
       "https://komikhq.dpdns.org",
       "https://nitro.komikhq.dpdns.org",
       "http://localhost:5173",
@@ -58,11 +72,11 @@ export function useAuth(event?: H3Event) {
       cookiePrefix: "komikhq",
       useSecureCookies: false,
       crossSubDomainCookies: {
-        enabled: true,
-        domain: (env?.BETTER_AUTH_URL || "").includes("localhost") ? undefined : ".komikhq.dpdns.org",
+        enabled: Boolean(cookieDomain),
+        domain: cookieDomain,
       },
       defaultCookieAttributes: {
-        domain: (env?.BETTER_AUTH_URL || "").includes("localhost") ? undefined : ".komikhq.dpdns.org",
+        domain: cookieDomain,
         sameSite: "lax",
         secure: true,
         httpOnly: true,

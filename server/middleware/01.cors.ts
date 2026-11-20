@@ -1,7 +1,12 @@
 import { defineMiddleware, handleCors } from "nitro/h3";
 
 export default defineMiddleware((event) => {
-  handleCors(event, {
+  // Never intercept or attach CORS headers to WebSocket upgrade requests
+  if (event.path.startsWith("/realtime/ws")) {
+    return;
+  }
+
+  const corsRes = handleCors(event, {
     origin: (origin: string) => {
       if (!origin) return true;
       if (
@@ -20,4 +25,8 @@ export default defineMiddleware((event) => {
     allowHeaders: ["Content-Type", "Authorization", "Cookie"],
     exposeHeaders: ["Content-Length", "Content-Range", "Set-Cookie"],
   });
+
+  if (corsRes) {
+    return corsRes;
+  }
 });

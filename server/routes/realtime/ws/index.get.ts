@@ -22,9 +22,9 @@ defineRouteMeta({
 export default defineHandler(async (event) => {
   const query = getQuery(event);
   const channel = (query.channel as string) || "global_presence";
-  const upgradeHeader = getHeader(event, "Upgrade");
+  const upgradeHeader = getHeader(event, "Upgrade") || getHeader(event, "upgrade");
 
-  if (upgradeHeader !== "websocket") {
+  if (!upgradeHeader || upgradeHeader.toLowerCase() !== "websocket") {
     throw new HTTPError({ status: 400, message: "Expected Upgrade: websocket" });
   }
 

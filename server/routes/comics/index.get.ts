@@ -75,7 +75,16 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
-    data: data.comics,
+    data: {
+      items: data.comics,
+      comics: data.comics,
+      pagination: {
+        page: data.page,
+        limit: data.limit,
+        total: data.total,
+        totalPages: data.totalPages,
+      },
+    },
     pagination: {
       page: data.page,
       limit: data.limit,

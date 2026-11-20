@@ -40,10 +40,15 @@ export async function findComicBySlug(
     .where(eq(chapters.comicId, comic.id))
     .orderBy(asc(chapters.chapterNumber));
 
-  return {
+  const comicObj = {
     ...comic,
     coverUrl: toPublicUrl(comic.coverUrl, "media", storageEnv || {}) ?? comic.coverUrl,
     bannerUrl: toPublicUrl(comic.bannerUrl, "media", storageEnv || {}),
+  };
+
+  return {
+    ...comicObj,
+    comic: comicObj,
     genres: linkedGenres,
     creators: linkedCreators,
     chapters: comicChapters,
