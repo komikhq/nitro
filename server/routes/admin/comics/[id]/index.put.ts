@@ -23,26 +23,8 @@ defineRouteMeta({
     ],
     requestBody: {
       content: {
-        "application/json": {
-          schema: {
-            title: "AdminUpdateComicJsonRequest",
-            type: "object",
-            properties: {
-              title: { type: "string" },
-              slug: { type: "string" },
-              synopsis: { type: "string" },
-              coverUrl: { type: "string" },
-              bannerUrl: { type: "string" },
-              type: { type: "string", enum: ["manga", "manhwa", "manhua"] },
-              status: { type: "string", enum: ["ongoing", "completed", "hiatus"] },
-              accessTier: { type: "string" },
-              genreIds: { type: "array", items: { type: "string" } },
-            },
-          },
-        },
         "multipart/form-data": {
           schema: {
-            title: "AdminUpdateComicFormDataRequest",
             type: "object",
             properties: {
               title: { type: "string" },

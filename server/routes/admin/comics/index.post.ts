@@ -21,27 +21,8 @@ defineRouteMeta({
     requestBody: {
       required: true,
       content: {
-        "application/json": {
-          schema: {
-            title: "AdminCreateComicJsonRequest",
-            type: "object",
-            required: ["title", "slug", "coverUrl"],
-            properties: {
-              title: { type: "string" },
-              slug: { type: "string" },
-              synopsis: { type: "string" },
-              coverUrl: { type: "string" },
-              bannerUrl: { type: "string" },
-              type: { type: "string", enum: ["manga", "manhwa", "manhua"], default: "manhwa" },
-              status: { type: "string", enum: ["ongoing", "completed", "hiatus"], default: "ongoing" },
-              accessTier: { type: "string", default: "free" },
-              genreIds: { type: "array", items: { type: "string" } },
-            },
-          },
-        },
         "multipart/form-data": {
           schema: {
-            title: "AdminCreateComicFormDataRequest",
             type: "object",
             required: ["title", "slug"],
             properties: {
