@@ -41,8 +41,33 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Chapter pages updated successfully." },
-      400: { description: "Invalid pages array." },
+      200: {
+        description: "Chapter pages updated successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "object",
+                  properties: {
+                    pagesCount: { type: "integer" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "Invalid pages array.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
       403: { description: "Forbidden." },
     },

@@ -16,7 +16,29 @@ defineRouteMeta({
       { name: "limit", in: "query", schema: { type: "integer", default: 20 } },
     ],
     responses: {
-      200: { description: "Search results list." },
+      200: {
+        description: "Search results list.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "object",
+                  properties: {
+                    items: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/Comic" },
+                    },
+                    pagination: { $ref: "#/components/schemas/Pagination" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
 });

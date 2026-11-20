@@ -28,8 +28,33 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Avatar updated successfully." },
-      400: { description: "Invalid file." },
+      200: {
+        description: "Avatar updated successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "object",
+                  properties: {
+                    avatarUrl: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "Invalid file.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
     },
   },

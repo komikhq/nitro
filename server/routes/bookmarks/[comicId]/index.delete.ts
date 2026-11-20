@@ -14,9 +14,23 @@ defineRouteMeta({
       { name: "comicId", in: "path", required: true, schema: { type: "string" }, description: "Comic ID" },
     ],
     responses: {
-      200: { description: "Bookmark removed successfully." },
+      200: {
+        description: "Bookmark removed successfully.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/SuccessResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
-      404: { description: "Bookmark not found." },
+      404: {
+        description: "Bookmark not found.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

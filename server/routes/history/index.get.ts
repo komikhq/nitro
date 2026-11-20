@@ -12,7 +12,23 @@ defineRouteMeta({
     description: "Returns reading history entries and chapter progress for the authenticated user.",
     security: [{ SessionCookie: [] }, { BearerToken: [] }],
     responses: {
-      200: { description: "Reading history list." },
+      200: {
+        description: "Reading history list.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/ReadingHistory" },
+                },
+              },
+            },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
     },
   },

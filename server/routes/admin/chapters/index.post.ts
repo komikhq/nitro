@@ -31,8 +31,28 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Chapter created successfully." },
-      400: { description: "Invalid input." },
+      200: {
+        description: "Chapter created successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: { $ref: "#/components/schemas/Chapter" },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "Invalid input.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
       403: { description: "Forbidden." },
     },

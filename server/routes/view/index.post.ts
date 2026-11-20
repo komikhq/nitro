@@ -26,8 +26,28 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "View recorded successfully." },
-      400: { description: "Invalid payload." },
+      200: {
+        description: "View recorded successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "Invalid payload.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

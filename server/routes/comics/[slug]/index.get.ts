@@ -13,8 +13,28 @@ defineRouteMeta({
       { name: "slug", in: "path", required: true, schema: { type: "string" }, description: "Unique comic slug identifier" },
     ],
     responses: {
-      200: { description: "Comic details retrieved successfully." },
-      404: { description: "Comic not found." },
+      200: {
+        description: "Comic details retrieved successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: { $ref: "#/components/schemas/ComicDetail" },
+              },
+            },
+          },
+        },
+      },
+      404: {
+        description: "Comic not found.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

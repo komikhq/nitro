@@ -31,8 +31,22 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Report submitted." },
-      400: { description: "Invalid payload." },
+      200: {
+        description: "Report submitted.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/SuccessResponse" },
+          },
+        },
+      },
+      400: {
+        description: "Invalid payload.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

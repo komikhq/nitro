@@ -12,7 +12,23 @@ defineRouteMeta({
     description: "Returns all saved comic bookmarks for the authenticated user.",
     security: [{ SessionCookie: [] }, { BearerToken: [] }],
     responses: {
-      200: { description: "User bookmarks list." },
+      200: {
+        description: "User bookmarks list.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/Bookmark" },
+                },
+              },
+            },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
     },
   },

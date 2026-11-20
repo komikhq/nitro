@@ -26,8 +26,22 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Account deleted successfully." },
-      400: { description: "Verification failed." },
+      200: {
+        description: "Account deleted successfully.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/SuccessResponse" },
+          },
+        },
+      },
+      400: {
+        description: "Verification failed.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
     },
   },

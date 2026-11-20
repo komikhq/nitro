@@ -12,7 +12,20 @@ defineRouteMeta({
     description: "Returns profile details and credential password status for the authenticated user.",
     security: [{ SessionCookie: [] }, { BearerToken: [] }],
     responses: {
-      200: { description: "User profile retrieved successfully." },
+      200: {
+        description: "User profile retrieved successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: { $ref: "#/components/schemas/UserProfile" },
+              },
+            },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
     },
   },

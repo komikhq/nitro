@@ -14,8 +14,53 @@ defineRouteMeta({
       { name: "chapterSlug", in: "path", required: true, schema: { type: "string" }, description: "Chapter slug" },
     ],
     responses: {
-      200: { description: "Chapter reader pages retrieved successfully." },
-      404: { description: "Chapter or comic not found." },
+      200: {
+        description: "Chapter reader pages retrieved successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "object",
+                  properties: {
+                    chapter: { $ref: "#/components/schemas/Chapter" },
+                    pages: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/ChapterPage" },
+                    },
+                    prevChapter: {
+                      type: "object",
+                      nullable: true,
+                      properties: {
+                        slug: { type: "string" },
+                        chapterNumber: { type: "string" },
+                      },
+                    },
+                    nextChapter: {
+                      type: "object",
+                      nullable: true,
+                      properties: {
+                        slug: { type: "string" },
+                        chapterNumber: { type: "string" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      404: {
+        description: "Chapter or comic not found.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

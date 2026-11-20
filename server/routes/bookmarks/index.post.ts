@@ -28,8 +28,28 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Bookmark saved successfully." },
-      400: { description: "Invalid payload." },
+      200: {
+        description: "Bookmark saved successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: { $ref: "#/components/schemas/Bookmark" },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "Invalid payload.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
     },
   },

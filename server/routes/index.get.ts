@@ -124,6 +124,80 @@ defineRouteMeta({
               createdAt: { type: "string", format: "date-time" },
             },
           },
+          ComicDetail: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              title: { type: "string" },
+              slug: { type: "string" },
+              synopsis: { type: "string", nullable: true },
+              coverUrl: { type: "string" },
+              bannerUrl: { type: "string", nullable: true },
+              type: { type: "string", enum: ["manga", "manhwa", "manhua"] },
+              status: { type: "string", enum: ["ongoing", "completed", "hiatus"] },
+              accessTier: { type: "string" },
+              totalChapters: { type: "integer" },
+              totalViews: { type: "integer" },
+              createdAt: { type: "string", format: "date-time" },
+              updatedAt: { type: "string", format: "date-time" },
+              genres: {
+                type: "array",
+                items: { $ref: "#/components/schemas/Genre" },
+              },
+              creators: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    role: { type: "string", enum: ["author", "artist"] },
+                  },
+                },
+              },
+              chapters: {
+                type: "array",
+                items: { $ref: "#/components/schemas/Chapter" },
+              },
+            },
+          },
+          ChapterPage: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              pageNumber: { type: "integer" },
+              imageUrl: { type: "string" },
+            },
+          },
+          Bookmark: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              comicId: { type: "string", format: "uuid" },
+              userId: { type: "string" },
+              createdAt: { type: "string", format: "date-time" },
+              comic: { $ref: "#/components/schemas/Comic" },
+            },
+          },
+          ReadingHistory: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              comicId: { type: "string", format: "uuid" },
+              chapterId: { type: "string", format: "uuid" },
+              lastPage: { type: "integer" },
+              updatedAt: { type: "string", format: "date-time" },
+              comic: { $ref: "#/components/schemas/Comic" },
+              chapter: { $ref: "#/components/schemas/Chapter" },
+            },
+          },
+          ComicRating: {
+            type: "object",
+            properties: {
+              averageRating: { type: "number" },
+              totalRatings: { type: "integer" },
+              userRating: { type: "integer", nullable: true },
+            },
+          },
         },
       },
     },

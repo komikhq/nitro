@@ -9,7 +9,23 @@ defineRouteMeta({
     summary: "List all comic genres",
     description: "Returns the full catalog of available comic genres.",
     responses: {
-      200: { description: "Genre catalog list." },
+      200: {
+        description: "Genre catalog list.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/Genre" },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
 });

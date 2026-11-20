@@ -34,10 +34,30 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Comic updated successfully." },
+      200: {
+        description: "Comic updated successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: { $ref: "#/components/schemas/Comic" },
+              },
+            },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
       403: { description: "Forbidden." },
-      404: { description: "Comic not found." },
+      404: {
+        description: "Comic not found.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

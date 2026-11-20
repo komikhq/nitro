@@ -12,7 +12,28 @@ defineRouteMeta({
       { name: "comicId", in: "path", required: true, schema: { type: "string" }, description: "Comic ID" },
     ],
     responses: {
-      200: { description: "Comic rating data." },
+      200: {
+        description: "Comic rating data.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: { $ref: "#/components/schemas/ComicRating" },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "Invalid comicId.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

@@ -14,9 +14,24 @@ defineRouteMeta({
       { name: "id", in: "path", required: true, schema: { type: "string" }, description: "Comment ID" },
     ],
     responses: {
-      200: { description: "Comment deleted successfully." },
+      200: {
+        description: "Comment deleted successfully.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/SuccessResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
       403: { description: "Forbidden." },
+      404: {
+        description: "Comment not found.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

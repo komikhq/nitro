@@ -15,7 +15,31 @@ defineRouteMeta({
       { name: "limit", in: "query", schema: { type: "integer", default: 8 }, description: "Max suggestions" },
     ],
     responses: {
-      200: { description: "Search suggestions list." },
+      200: {
+        description: "Search suggestions list.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      title: { type: "string" },
+                      slug: { type: "string" },
+                      type: { type: "string" },
+                      coverUrl: { type: "string" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
 });

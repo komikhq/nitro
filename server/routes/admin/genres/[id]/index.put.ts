@@ -29,10 +29,30 @@ defineRouteMeta({
       },
     },
     responses: {
-      200: { description: "Genre updated successfully." },
+      200: {
+        description: "Genre updated successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: { $ref: "#/components/schemas/Genre" },
+              },
+            },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
       403: { description: "Forbidden." },
-      404: { description: "Genre not found." },
+      404: {
+        description: "Genre not found.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

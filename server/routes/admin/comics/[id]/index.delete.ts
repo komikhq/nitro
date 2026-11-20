@@ -14,10 +14,24 @@ defineRouteMeta({
       { name: "id", in: "path", required: true, schema: { type: "string" }, description: "Comic ID" },
     ],
     responses: {
-      200: { description: "Comic deleted successfully." },
+      200: {
+        description: "Comic deleted successfully.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/SuccessResponse" },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
       403: { description: "Forbidden." },
-      404: { description: "Comic not found." },
+      404: {
+        description: "Comic not found.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

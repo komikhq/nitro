@@ -12,6 +12,32 @@ defineRouteMeta({
     responses: {
       200: {
         description: "Health status details.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                timestamp: { type: "string", format: "date-time" },
+                database: {
+                  type: "object",
+                  properties: {
+                    status: { type: "string" },
+                    latencyMs: { type: "number", nullable: true },
+                  },
+                },
+                services: {
+                  type: "object",
+                  properties: {
+                    kv: { type: "boolean" },
+                    analytics: { type: "boolean" },
+                    r2: { type: "boolean" },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   },

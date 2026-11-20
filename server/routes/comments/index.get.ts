@@ -15,8 +15,31 @@ defineRouteMeta({
       { name: "chapterId", in: "query", schema: { type: "string", format: "uuid" }, description: "Optional chapter ID filter" },
     ],
     responses: {
-      200: { description: "Comments thread list." },
-      400: { description: "comicId is missing." },
+      200: {
+        description: "Comments thread list.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/Comment" },
+                },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "comicId is missing.",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ErrorResponse" },
+          },
+        },
+      },
     },
   },
 });

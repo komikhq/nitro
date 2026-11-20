@@ -14,7 +14,26 @@ defineRouteMeta({
       { name: "id", in: "path", required: true, schema: { type: "string" }, description: "Comment ID" },
     ],
     responses: {
-      200: { description: "Like status toggled." },
+      200: {
+        description: "Like status toggled.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "ok" },
+                data: {
+                  type: "object",
+                  properties: {
+                    liked: { type: "boolean" },
+                    likesCount: { type: "integer" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       401: { description: "Unauthorized." },
     },
   },
