@@ -67,10 +67,13 @@ export default defineHandler(async (event) => {
 
     return {
       status: "ok",
+      success: true,
       message: `Search suggestion cache invalidated successfully (${clearedKeys} cached queries cleared).`,
       data: {
         clearedKeys,
       },
+      "cleared-keys": clearedKeys,
+      clearedKeys,
     };
   } catch (err: any) {
     throw new HTTPError({

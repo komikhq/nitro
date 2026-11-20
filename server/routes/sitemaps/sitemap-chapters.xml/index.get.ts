@@ -84,12 +84,13 @@ export default defineHandler(async (event) => {
   }
 
   appendHeader(event, "Content-Type", "application/xml; charset=utf-8");
+  appendHeader(event, "Cache-Control", "public, max-age=86400, s-maxage=86400, stale-while-revalidate=43200");
 
   const urls = chapterList
     .map(
       (ch) => `
   <url>
-    <loc>https://komikhq.dpdns.org/comics/${ch.comicSlug}/${ch.chapterSlug}</loc>
+    <loc>https://komikhq.com/komik/${ch.comicSlug}/${ch.chapterSlug}</loc>
     <lastmod>${ch.updatedAt ? new Date(ch.updatedAt).toISOString() : new Date().toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

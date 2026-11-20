@@ -97,5 +97,9 @@ export default defineHandler(async (event) => {
       page,
       limit,
     },
+    chapters: chapterList,
+    total: totalResult[0]?.total ?? 0,
+    page,
+    limit,
   };
 });

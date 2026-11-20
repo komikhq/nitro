@@ -85,7 +85,9 @@ export default defineHandler(async (event) => {
     const updated = await updateUserById(db, auth, id, body, rawHeaders);
     return {
       status: "ok",
+      success: true,
       data: updated,
+      user: updated,
     };
   } catch (err: any) {
     throw new HTTPError({

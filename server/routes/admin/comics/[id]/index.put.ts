@@ -147,10 +147,16 @@ export default defineHandler(async (event) => {
     throw new HTTPError({ status: 404, message: "Comic not found." });
   }
 
+  const resolvedComic = {
+    ...comic,
+    coverUrl: toPublicUrl(comic.coverUrl, "media", env) ?? comic.coverUrl,
+    bannerUrl: toPublicUrl(comic.bannerUrl, "media", env),
+  };
+
   return {
     status: "ok",
     success: true,
-    data: comic,
-    comic,
+    data: resolvedComic,
+    comic: resolvedComic,
   };
 });

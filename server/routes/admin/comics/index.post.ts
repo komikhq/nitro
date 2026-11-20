@@ -154,10 +154,16 @@ export default defineHandler(async (event) => {
 
   const comic = await createComic(db, comicParams);
 
+  const resolvedComic = {
+    ...comic,
+    coverUrl: toPublicUrl(comic.coverUrl, "media", env) ?? comic.coverUrl,
+    bannerUrl: toPublicUrl(comic.bannerUrl, "media", env),
+  };
+
   return {
     status: "ok",
     success: true,
-    data: comic,
-    comic,
+    data: resolvedComic,
+    comic: resolvedComic,
   };
 });

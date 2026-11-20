@@ -20,10 +20,30 @@ export async function findReportMany(db: DbClient, status: string = "PENDING") {
 }
 
 export async function updateReportStatus(db: DbClient, reportId: string, status: string) {
+  const [report] = await db
+    .select()
+    .from(commentReports)
+    .where(eq(commentReports.id, reportId));
+
+  if (!report) return null;
+
+  if (status === "RESOLVED") {
+    // Soft-delete reported comment as intended by moderation resolution
+    await db
+      .update(comments)
+      .set({
+        isDeleted: true,
+        content: "[Comment removed by moderator]",
+        updatedAt: new Date(),
+      })
+      .where(eq(comments.id, report.commentId));
+  }
+
   const [updated] = await db
     .update(commentReports)
     .set({ status })
     .where(eq(commentReports.id, reportId))
     .returning();
+
   return updated;
 }

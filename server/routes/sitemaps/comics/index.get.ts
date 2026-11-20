@@ -78,5 +78,7 @@ export default defineHandler(async (event) => {
       comics: comicList,
       total: totalResult[0]?.total ?? 0,
     },
+    comics: comicList,
+    total: totalResult[0]?.total ?? 0,
   };
 });

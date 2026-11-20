@@ -53,6 +53,7 @@ export default defineHandler(async (event) => {
     const deletedUser = await deleteUserById(db, env, id, currentUser.id);
     return {
       status: "ok",
+      success: true,
       message: `User ${deletedUser.name} (${deletedUser.email}) deleted successfully.`,
     };
   } catch (err: any) {

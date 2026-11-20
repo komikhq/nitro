@@ -43,8 +43,21 @@ export default defineHandler(async (event) => {
   const env = useCloudflareEnv(event);
   const health = await findSystemHealth(env);
 
+  const enrichedHealth = {
+    ...health,
+    "cached-search-keys-count": health.cachedSearchKeysCount,
+    "kv-healthy": health.kvHealthy,
+    "kv-views-healthy": health.kvViewsHealthy,
+    "ae-healthy": health.aeHealthy,
+    "last-synced-at": health.lastSyncedAt,
+    "cached-rankings-count": health.cachedRankingsCount,
+    "r2-healthy": health.r2Healthy,
+  };
+
   return {
     status: "ok",
-    data: health,
+    success: true,
+    data: enrichedHealth,
+    ...enrichedHealth,
   };
 });

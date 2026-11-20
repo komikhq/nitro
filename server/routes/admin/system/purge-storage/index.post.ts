@@ -50,8 +50,12 @@ export default defineHandler(async (event) => {
     const result = await purgeStorageOrphans(db, env);
     return {
       status: "ok",
+      success: true,
       message: `Cleanup successful! ${result.purgedCount} orphan files (${result.totalSizeMB} MB) deleted from storage.`,
       data: result,
+      "purged-count": result.purgedCount,
+      "total-size-mb": result.totalSizeMB,
+      ...result,
     };
   } catch (err: any) {
     throw new HTTPError({

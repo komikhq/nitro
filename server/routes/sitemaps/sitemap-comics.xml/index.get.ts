@@ -78,12 +78,13 @@ export default defineHandler(async (event) => {
   }
 
   appendHeader(event, "Content-Type", "application/xml; charset=utf-8");
+  appendHeader(event, "Cache-Control", "public, max-age=86400, s-maxage=86400, stale-while-revalidate=43200");
 
   const urls = comicList
     .map(
       (c) => `
   <url>
-    <loc>https://komikhq.dpdns.org/comics/${c.slug}</loc>
+    <loc>https://komikhq.com/komik/${c.slug}</loc>
     <lastmod>${c.updatedAt ? new Date(c.updatedAt).toISOString() : new Date().toISOString()}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -94,7 +95,7 @@ export default defineHandler(async (event) => {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://komikhq.dpdns.org/</loc>
+    <loc>https://komikhq.com/</loc>
     <changefreq>always</changefreq>
     <priority>1.0</priority>
   </url>${urls}
