@@ -11,18 +11,25 @@ import { renderResetPasswordEmailTemplate } from "@/server/lib/email/templates/r
 import { uploadToR2, type StorageEnv } from "@/server/lib/storage";
 
 let _authInstance: any = null;
+let _authEnvSignature: string | null = null;
 
 /**
  * Access Better Auth instance.
  * Lazily initializes with Drizzle adapter and dynamic environment values.
  */
 export function useAuth(event?: H3Event) {
-  if (_authInstance) {
-    return _authInstance;
-  }
-
   const env = event ? useCloudflareEnv(event) : ((globalThis as any).__env__ || (process.env as any));
   const db = useDb(event);
+
+  const databaseUrl = env?.DATABASE_URL || process.env.DATABASE_URL || "";
+  const googleClientId = env?.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "";
+  const discordClientId = (env as any)?.DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "";
+  const facebookClientId = (env as any)?.FACEBOOK_CLIENT_ID || process.env.FACEBOOK_CLIENT_ID || "";
+  const envSig = `${databaseUrl}:${googleClientId}:${discordClientId}:${facebookClientId}`;
+
+  if (_authInstance && _authEnvSignature === envSig) {
+    return _authInstance;
+  }
 
   const baseUrl =
     env?.BETTER_AUTH_URL ||
@@ -142,49 +149,50 @@ export function useAuth(event?: H3Event) {
       },
     },
     socialProviders: {
-      google: {
-        clientId: env?.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "",
-        clientSecret: env?.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || "",
-        enabled: Boolean(
-          (env?.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID) &&
-          (env?.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET)
-        ),
-        prompt: "select_account consent",
-        accessType: "offline",
-        scope: ["openid", "profile", "email"],
-        mapProfileToUser: async (profile) => ({
-          image: profile.picture || (profile as any).avatar_url || undefined,
-        }),
-      },
-      discord: {
-        clientId: (env as any)?.DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "",
-        clientSecret: (env as any)?.DISCORD_CLIENT_SECRET || process.env.DISCORD_CLIENT_SECRET || "",
-        enabled: Boolean(
-          ((env as any)?.DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID) &&
-          ((env as any)?.DISCORD_CLIENT_SECRET || process.env.DISCORD_CLIENT_SECRET)
-        ),
-        scope: ["identify", "email"],
-        mapProfileToUser: async (profile: any) => ({
-          image: profile.avatar
-            ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
-            : undefined,
-        }),
-      },
-      facebook: {
-        clientId: (env as any)?.FACEBOOK_CLIENT_ID || process.env.FACEBOOK_CLIENT_ID || "",
-        clientSecret: (env as any)?.FACEBOOK_CLIENT_SECRET || process.env.FACEBOOK_CLIENT_SECRET || "",
-        enabled: Boolean(
-          ((env as any)?.FACEBOOK_CLIENT_ID || process.env.FACEBOOK_CLIENT_ID) &&
-          ((env as any)?.FACEBOOK_CLIENT_SECRET || process.env.FACEBOOK_CLIENT_SECRET)
-        ),
-        scope: ["email", "public_profile"],
-        mapProfileToUser: async (profile: any) => ({
-          image: profile.picture?.data?.url || profile.avatar_url || undefined,
-        }),
-      },
+      ...(env?.GOOGLE_CLIENT_ID && env?.GOOGLE_CLIENT_SECRET
+        ? {
+            google: {
+              clientId: env.GOOGLE_CLIENT_ID,
+              clientSecret: env.GOOGLE_CLIENT_SECRET,
+              prompt: "select_account consent",
+              accessType: "offline",
+              scope: ["openid", "profile", "email"],
+              mapProfileToUser: async (profile: any) => ({
+                image: profile.picture || profile.avatar_url || undefined,
+              }),
+            },
+          }
+        : {}),
+      ...((env as any)?.DISCORD_CLIENT_ID && (env as any)?.DISCORD_CLIENT_SECRET
+        ? {
+            discord: {
+              clientId: (env as any).DISCORD_CLIENT_ID,
+              clientSecret: (env as any).DISCORD_CLIENT_SECRET,
+              scope: ["identify", "email"],
+              mapProfileToUser: async (profile: any) => ({
+                image: profile.avatar
+                  ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
+                  : undefined,
+              }),
+            },
+          }
+        : {}),
+      ...((env as any)?.FACEBOOK_CLIENT_ID && (env as any)?.FACEBOOK_CLIENT_SECRET
+        ? {
+            facebook: {
+              clientId: (env as any).FACEBOOK_CLIENT_ID,
+              clientSecret: (env as any).FACEBOOK_CLIENT_SECRET,
+              scope: ["email", "public_profile"],
+              mapProfileToUser: async (profile: any) => ({
+                image: profile.picture?.data?.url || profile.avatar_url || undefined,
+              }),
+            },
+          }
+        : {}),
     },
     plugins: [admin(), bearer(), jwt()],
   });
 
+  _authEnvSignature = envSig;
   return _authInstance;
 }
