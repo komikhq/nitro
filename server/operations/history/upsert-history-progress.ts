@@ -13,22 +13,44 @@ export interface UpsertHistoryParams {
 export async function upsertHistoryProgress(db: DbClient, params: UpsertHistoryParams) {
   const { userId, comicId, chapterId, lastReadPage, snapshotTotalPages, isCompleted = false } = params;
 
-  const [existing] = await db
+  const [existingChapter] = await db
     .select()
     .from(readingHistories)
     .where(and(eq(readingHistories.userId, userId), eq(readingHistories.chapterId, chapterId)));
 
-  if (existing) {
+  if (existingChapter) {
     const [updated] = await db
       .update(readingHistories)
       .set({
+        comicId,
         lastReadPage,
         snapshotTotalPages,
         isCompleted,
         lastReadAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(readingHistories.id, existing.id))
+      .where(eq(readingHistories.id, existingChapter.id))
+      .returning();
+    return updated;
+  }
+
+  const [existingComic] = await db
+    .select()
+    .from(readingHistories)
+    .where(and(eq(readingHistories.userId, userId), eq(readingHistories.comicId, comicId)));
+
+  if (existingComic) {
+    const [updated] = await db
+      .update(readingHistories)
+      .set({
+        chapterId,
+        lastReadPage,
+        snapshotTotalPages,
+        isCompleted,
+        lastReadAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(readingHistories.id, existingComic.id))
       .returning();
     return updated;
   }

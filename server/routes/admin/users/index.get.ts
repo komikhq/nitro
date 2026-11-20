@@ -51,6 +51,10 @@ defineRouteMeta({
                       type: "array",
                       items: { $ref: "#/components/schemas/UserProfile" },
                     },
+                    users: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/UserProfile" },
+                    },
                     pagination: { $ref: "#/components/schemas/Pagination" },
                   },
                 },
@@ -84,6 +88,13 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
-    data: result,
+    data: {
+      items: result.users,
+      users: result.users,
+      pagination: result.pagination,
+    },
+    items: result.users,
+    users: result.users,
+    pagination: result.pagination,
   };
 });

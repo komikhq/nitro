@@ -48,6 +48,7 @@ export async function findUserMany(
   }));
 
   return {
+    items: resolvedUsers,
     users: resolvedUsers,
     pagination: {
       page,

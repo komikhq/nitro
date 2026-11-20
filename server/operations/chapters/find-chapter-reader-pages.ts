@@ -40,10 +40,39 @@ export async function findChapterReaderPages(
     imageUrl: toPublicUrl(p.imageUrl, "media", storageEnv || {}) ?? p.imageUrl,
   }));
 
+  const currentIndex = allChapters.findIndex((ch) => ch.id === chapter.id || ch.slug === chapter.slug);
+  const prev = currentIndex > 0 ? allChapters[currentIndex - 1] : null;
+  const next = currentIndex >= 0 && currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
+
+  const prevChapter = prev
+    ? {
+        id: prev.id,
+        slug: prev.slug,
+        chapterNumber: String(prev.chapterNumber),
+        title: prev.title || `Chapter ${prev.chapterNumber}`,
+      }
+    : null;
+
+  const nextChapter = next
+    ? {
+        id: next.id,
+        slug: next.slug,
+        chapterNumber: String(next.chapterNumber),
+        title: next.title || `Chapter ${next.chapterNumber}`,
+      }
+    : null;
+
   return {
-    comic: { id: comic.id, title: comic.title, slug: comic.slug },
+    comic: {
+      id: comic.id,
+      title: comic.title,
+      slug: comic.slug,
+      coverUrl: toPublicUrl(comic.coverUrl, "media", storageEnv) ?? comic.coverUrl,
+    },
     chapter,
     pages: enrichedPages,
     allChapters,
+    prevChapter,
+    nextChapter,
   };
 }

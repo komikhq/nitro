@@ -38,14 +38,19 @@ defineRouteMeta({
 export default defineHandler(async (event) => {
   const query = getQuery(event);
   const limit = Math.min(Number(query.limit) || 10, 50);
+  const periodParam = (query.period as string) || "daily";
+  const period = (["daily", "weekly", "popular"].includes(periodParam) ? periodParam : "daily") as "daily" | "weekly" | "popular";
 
   const db = useDb(event);
   const env = useCloudflareEnv(event);
 
-  const data = await findComicTrending(db, limit, env);
+  const data = await findComicTrending(db, limit, env, period, (env as any)?.KV_VIEWS);
 
   return {
     status: "ok",
+    period,
+    total: data.comics?.length || 0,
     data: data.comics,
+    comics: data.comics,
   };
 });

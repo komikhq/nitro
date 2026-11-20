@@ -11,23 +11,42 @@ export interface StorageEnv {
   MEDIA_BUCKET_URL?: string;
 }
 
-function getBucketBaseUrl(bucketKey: BucketKey, env: Partial<StorageEnv>): string | undefined {
-  if (bucketKey === "users") return env.BUCKET_URL_USERS || env.USERS_BUCKET_URL;
-  return env.BUCKET_URL_MEDIA || env.MEDIA_BUCKET_URL;
+function getBucketBaseUrl(bucketKey: BucketKey, env?: Partial<StorageEnv>): string {
+  if (bucketKey === "users") {
+    return (
+      env?.BUCKET_URL_USERS ||
+      env?.USERS_BUCKET_URL ||
+      (env as any)?.bucketUrlUsers ||
+      process.env.BUCKET_URL_USERS ||
+      (globalThis as any).__env__?.BUCKET_URL_USERS ||
+      "https://cdn-01.komikhq.dpdns.org"
+    );
+  }
+  return (
+    env?.BUCKET_URL_MEDIA ||
+    env?.MEDIA_BUCKET_URL ||
+    (env as any)?.bucketUrlMedia ||
+    process.env.BUCKET_URL_MEDIA ||
+    (globalThis as any).__env__?.BUCKET_URL_MEDIA ||
+    "https://cdn-02.komikhq.dpdns.org"
+  );
 }
 
-export function getPublicStorageUrl(bucketKey: BucketKey, objectKey: string, env: Partial<StorageEnv>): string {
+export function getPublicStorageUrl(bucketKey: BucketKey, objectKey: string, env?: Partial<StorageEnv>): string {
   const domain = getBucketBaseUrl(bucketKey, env);
-  if (!domain) throw new Error(`Public domain URL for bucket '${bucketKey}' is missing.`);
   const baseUrl = domain.replace(/\/$/, "");
   const cleanKey = objectKey.replace(/^\//, "");
   return `${baseUrl}/${cleanKey}`;
 }
 
-export function toPublicUrl(pathOrUrl: string | null | undefined, bucketKey: BucketKey, env: Partial<StorageEnv>): string | null {
+export function toPublicUrl(pathOrUrl: string | null | undefined, bucketKey: BucketKey, env?: Partial<StorageEnv>): string | null {
   if (!pathOrUrl) return null;
   if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
-  return getPublicStorageUrl(bucketKey, pathOrUrl, env);
+  try {
+    return getPublicStorageUrl(bucketKey, pathOrUrl, env);
+  } catch {
+    return pathOrUrl;
+  }
 }
 
 export function toObjectKey(pathOrUrl: string): string {

@@ -34,9 +34,11 @@ export async function findHistoryManyByUser(
     comicId: h.comicId,
     chapterId: h.chapterId,
     lastReadPage: h.lastReadPage,
+    lastPage: h.lastReadPage,
     snapshotTotalPages: h.snapshotTotalPages,
     isCompleted: h.isCompleted,
     lastReadAt: h.lastReadAt,
+    updatedAt: h.lastReadAt,
     comic: {
       id: h.comicId,
       title: h.comicTitle,
@@ -46,6 +48,7 @@ export async function findHistoryManyByUser(
     chapter: {
       id: h.chapterId,
       number: h.chapterNumber,
+      chapterNumber: h.chapterNumber,
       title: h.chapterTitle,
       slug: h.chapterSlug,
     },

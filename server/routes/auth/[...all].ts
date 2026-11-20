@@ -1,6 +1,8 @@
 import { defineHandler, defineRouteMeta } from "nitro";
 import { getRequestURL, readRawBody } from "nitro/h3";
 import { useAuth } from "@/server/utils/auth";
+import { useCloudflareEnv } from "@/server/utils/cloudflare";
+import { toPublicUrl, type StorageEnv } from "@/server/lib/storage";
 
 defineRouteMeta({
   openAPI: {
@@ -40,7 +42,41 @@ export default defineHandler(async (event) => {
       });
     }
 
-    return await auth.handler(request);
+    const response = await auth.handler(request);
+    const contentType = response.headers.get("content-type");
+    if (contentType?.includes("application/json")) {
+      try {
+        const cloned = response.clone();
+        const data: any = await cloned.json();
+        if (data && typeof data === "object") {
+          const env = useCloudflareEnv(event) as unknown as Partial<StorageEnv>;
+          let modified = false;
+
+          if (data.user && typeof data.user === "object" && data.user.image) {
+            data.user.image = toPublicUrl(data.user.image, "users", env) ?? data.user.image;
+            modified = true;
+          }
+          if (data.image && typeof data.image === "string") {
+            data.image = toPublicUrl(data.image, "users", env) ?? data.image;
+            modified = true;
+          }
+
+          if (modified) {
+            const newHeaders = new Headers(response.headers);
+            newHeaders.delete("content-length");
+            return new Response(JSON.stringify(data), {
+              status: response.status,
+              statusText: response.statusText,
+              headers: newHeaders,
+            });
+          }
+        }
+      } catch {
+        // Fallback to original response on parsing errors
+      }
+    }
+
+    return response;
   } catch (error: any) {
     console.error("[Better Auth Handler Exception]:", error);
     return new Response(

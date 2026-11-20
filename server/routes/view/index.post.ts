@@ -1,5 +1,5 @@
 import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
-import { readBody } from "nitro/h3";
+import { readBody, getHeader } from "nitro/h3";
 import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { recordView } from "@/server/operations/views";
 import { ViewRecordSchema } from "@/server/schemas";
@@ -53,6 +53,17 @@ defineRouteMeta({
 });
 
 export default defineHandler(async (event) => {
+  const userAgent = getHeader(event, "user-agent") || "";
+  const isBot = /bot|crawl|spider|slurp|facebookexternalhit|bytespider/i.test(userAgent);
+  if (isBot) {
+    return {
+      status: "ok",
+      success: true,
+      ignored: true,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   const body = await readBody(event);
   const parsed = ViewRecordSchema.safeParse(body);
 
@@ -65,6 +76,7 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
+    success: true,
     message: "View recorded successfully.",
   };
 });

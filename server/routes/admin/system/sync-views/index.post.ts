@@ -45,12 +45,32 @@ export default defineHandler(async (event) => {
     const viewsResult = await runTask("views:sync-delta");
     const rankingsResult = await runTask("rankings:refresh");
 
+    const viewsData: any = (viewsResult as any)?.result || viewsResult;
+    const rankingsData: any = (rankingsResult as any)?.result || rankingsResult;
+
+    const syncedChapters = viewsData?.syncedChapters ?? 0;
+    const syncedComics = viewsData?.syncedComics ?? 0;
+    const totalViewsAdded = viewsData?.totalViewsAdded ?? 0;
+
     return {
       status: "ok",
-      message: "View counts and rankings synchronized successfully.",
+      success: true,
+      message: `Successfully synchronized ${syncedChapters} chapters across ${syncedComics} comics (+${totalViewsAdded} views). Rankings refreshed.`,
+      "synced-chapters": syncedChapters,
+      "synced-comics": syncedComics,
+      "total-views-added": totalViewsAdded,
+      "synced-logs": totalViewsAdded,
+      "affected-comics": syncedComics,
+      rankings: rankingsData,
       data: {
         viewsResult,
         rankingsResult,
+        "synced-chapters": syncedChapters,
+        "synced-comics": syncedComics,
+        "total-views-added": totalViewsAdded,
+        "synced-logs": totalViewsAdded,
+        "affected-comics": syncedComics,
+        rankings: rankingsData,
       },
     };
   } catch (err: any) {

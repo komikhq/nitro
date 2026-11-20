@@ -25,25 +25,50 @@ defineRouteMeta({
                 data: {
                   type: "object",
                   properties: {
+                    comic: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        title: { type: "string" },
+                        slug: { type: "string" },
+                        coverUrl: { type: "string", nullable: true },
+                      },
+                    },
                     chapter: { $ref: "#/components/schemas/Chapter" },
                     pages: {
                       type: "array",
                       items: { $ref: "#/components/schemas/ChapterPage" },
                     },
+                    allChapters: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string" },
+                          chapterNumber: { type: "string" },
+                          slug: { type: "string" },
+                          title: { type: "string", nullable: true },
+                        },
+                      },
+                    },
                     prevChapter: {
                       type: "object",
                       nullable: true,
                       properties: {
+                        id: { type: "string" },
                         slug: { type: "string" },
                         chapterNumber: { type: "string" },
+                        title: { type: "string", nullable: true },
                       },
                     },
                     nextChapter: {
                       type: "object",
                       nullable: true,
                       properties: {
+                        id: { type: "string" },
                         slug: { type: "string" },
                         chapterNumber: { type: "string" },
+                        title: { type: "string", nullable: true },
                       },
                     },
                   },
