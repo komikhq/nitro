@@ -34,7 +34,7 @@ export default defineConfig({
   runtimeConfig: {
     databaseUrl: "",
     betterAuthSecret: "",
-    betterAuthUrl: "https://api.komikhq.dpdns.org",
+    betterAuthUrl: "https://nitro.komikhq.dpdns.org",
     googleClientId: "",
     googleClientSecret: "",
     bucketUrlUsers: "https://cdn-01.komikhq.dpdns.org",

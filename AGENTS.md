@@ -11,7 +11,7 @@ This is a [Nitro](https://nitro.build) v3 server project (built on H3 v2). Nitro
 
 ### 1. No `/v1` and No `/api` Prefix Policy
 - **Do NOT use the `/v1` prefix** and **do NOT use the `/api` prefix** anywhere in route definitions.
-- The service is served directly on the `api.*` subdomain (e.g., `api.komikhq.dpdns.org`), so all endpoints are placed directly at the root under `server/routes/`.
+- The service is served directly on the root/subdomain (e.g., `nitro.komikhq.dpdns.org`), so all endpoints are placed directly at the root under `server/routes/`.
 - **Do NOT place application routes inside `server/api/`** (since Nitro automatically prefixes `server/api/` files with `/api`). Always place all handlers in `server/routes/`.
 - Examples:
   - Auth handler: `/auth/*` -> `server/routes/auth/[...all].ts`

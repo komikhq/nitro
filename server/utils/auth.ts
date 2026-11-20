@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { admin } from "better-auth/plugins";
+import { admin, bearer, jwt } from "better-auth/plugins";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import type { H3Event } from "nitro/h3";
 import { useDb } from "./db";
@@ -41,12 +41,13 @@ export function useAuth(event?: H3Event) {
       },
     },
     secret: env?.BETTER_AUTH_SECRET || process.env.BETTER_AUTH_SECRET || "default_secret_for_dev_min_32_characters",
-    baseURL: env?.BETTER_AUTH_URL || process.env.BETTER_AUTH_URL || "https://api.komikhq.dpdns.org",
+    baseURL: env?.BETTER_AUTH_URL || process.env.BETTER_AUTH_URL || "https://nitro.komikhq.dpdns.org",
     basePath: "/auth", // No /v1, No /api prefix
     trustedOrigins: [
       "https://komikhq.com",
       "https://www.komikhq.com",
       "https://komikhq.dpdns.org",
+      "https://nitro.komikhq.dpdns.org",
       "http://localhost:5173",
       "http://localhost:4321",
       "http://localhost:3000",
@@ -140,7 +141,7 @@ export function useAuth(event?: H3Event) {
         }),
       },
     },
-    plugins: [admin()],
+    plugins: [admin(), bearer(), jwt()],
   });
 
   return _authInstance;
