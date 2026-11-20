@@ -65,7 +65,10 @@ export default defineHandler(async (event) => {
   const body = (await readBody(event)) as InitializeChapterParams | null;
 
   if (!body || !body.comicId || !body.chapterNumber) {
-    throw new HTTPError({ status: 400, message: "comicId and chapterNumber are required." });
+    throw new HTTPError({
+      status: 400,
+      message: "comicId and chapterNumber are required.",
+    });
   }
 
   const db = useDb(event);
@@ -73,6 +76,8 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
+    success: true,
     data: chapter,
+    chapter,
   };
 });

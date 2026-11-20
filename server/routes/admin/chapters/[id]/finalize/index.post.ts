@@ -67,20 +67,20 @@ defineRouteMeta({
 
 export default defineHandler(async (event) => {
   requireAdmin(event);
-  const chapterId = event.context.params?.id;
+  const id = event.context.params?.id;
 
-  if (!chapterId) {
+  if (!id) {
     throw new HTTPError({ status: 400, message: "Chapter ID is required." });
   }
 
-  const body = (await readBody(event)) as { totalPages?: number } | null;
+  const body = (await readBody(event)) as { totalPages: number } | null;
 
   if (!body || typeof body.totalPages !== "number") {
-    throw new HTTPError({ status: 400, message: "totalPages is required and must be a number." });
+    throw new HTTPError({ status: 400, message: "totalPages is required as a number." });
   }
 
   const db = useDb(event);
-  const chapter = await finalizeChapter(db, chapterId, body.totalPages);
+  const chapter = await finalizeChapter(db, id, body.totalPages);
 
   if (!chapter) {
     throw new HTTPError({ status: 404, message: "Chapter not found." });
@@ -88,6 +88,8 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
+    success: true,
     data: chapter,
+    chapter,
   };
 });

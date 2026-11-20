@@ -1,5 +1,5 @@
-import { chapters, type DbClient } from "@/server/db";
-import { eq } from "drizzle-orm";
+import { chapters, comics, type DbClient } from "@/server/db";
+import { eq, count } from "drizzle-orm";
 
 export interface CreateChapterParams {
   comicId: string;
@@ -22,6 +22,17 @@ export async function createChapter(db: DbClient, params: CreateChapterParams) {
       isEarlyAccess: params.isEarlyAccess || false,
     })
     .returning();
+
+  // Recount and update totalChapters on parent comic
+  const [{ value }] = await db
+    .select({ value: count() })
+    .from(chapters)
+    .where(eq(chapters.comicId, params.comicId));
+
+  await db
+    .update(comics)
+    .set({ totalChapters: value, updatedAt: new Date() })
+    .where(eq(comics.id, params.comicId));
 
   return chapter;
 }

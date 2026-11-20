@@ -30,6 +30,7 @@ defineRouteMeta({
               title: { type: "string" },
               slug: { type: "string" },
               synopsis: { type: "string" },
+              creator: { type: "string" },
               cover: { type: "string", format: "binary", description: "Cover image file" },
               coverUrlSource: { type: "string", description: "External cover image URL to download" },
               coverUrl: { type: "string", description: "Pre-existing storage object key" },
@@ -96,6 +97,7 @@ export default defineHandler(async (event) => {
     const type = formData.get("type")?.toString() || undefined;
     const status = formData.get("status")?.toString() || undefined;
     const accessTier = formData.get("accessTier")?.toString() || undefined;
+    const creatorName = formData.get("creator")?.toString().trim() || formData.get("creatorName")?.toString().trim() || undefined;
 
     const fileSlug = slug || id;
 
@@ -133,6 +135,7 @@ export default defineHandler(async (event) => {
       ...(status && { status }),
       ...(accessTier && { accessTier }),
       ...(genreIds && { genreIds }),
+      ...(creatorName !== undefined && { creatorName }),
     };
   } else {
     updateParams = (await readBody(event)) as UpdateComicParams;
@@ -146,6 +149,8 @@ export default defineHandler(async (event) => {
 
   return {
     status: "ok",
+    success: true,
     data: comic,
+    comic,
   };
 });

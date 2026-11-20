@@ -1,5 +1,6 @@
 import { comics, comicGenres, comicCreators, type DbClient } from "@/server/db";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { syncCreator } from "./sync-creator";
 
 export interface CreateComicParams {
   title: string;
@@ -13,6 +14,7 @@ export interface CreateComicParams {
   accessTier?: string;
   genreIds?: string[];
   creatorIds?: { creatorId: string; role?: string }[];
+  creatorName?: string;
 }
 
 export async function createComic(db: DbClient, params: CreateComicParams) {
@@ -40,7 +42,9 @@ export async function createComic(db: DbClient, params: CreateComicParams) {
     );
   }
 
-  if (params.creatorIds && params.creatorIds.length > 0) {
+  if (params.creatorName) {
+    await syncCreator(db, comic.id, params.creatorName);
+  } else if (params.creatorIds && params.creatorIds.length > 0) {
     await db.insert(comicCreators).values(
       params.creatorIds.map((c) => ({
         comicId: comic.id,

@@ -18,3 +18,4 @@ export * from "./update-chapter-by-id";
 export * from "./finalize-chapter";
 export * from "./upload-chapter-page";
 export * from "./upload-comic-media";
+export * from "./sync-creator";

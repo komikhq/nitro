@@ -1,6 +1,6 @@
 import { chapters, chapterPages, comics, type DbClient } from "@/server/db";
 import { eq } from "drizzle-orm";
-import { uploadToR2, type StorageEnv } from "@/server/lib/storage";
+import { uploadToR2, toPublicUrl, type StorageEnv } from "@/server/lib/storage";
 
 export interface UploadChapterPageParams {
   chapterId: string;
@@ -67,5 +67,9 @@ export async function uploadChapterPage(
     })
     .returning();
 
-  return page;
+  return {
+    ...page,
+    imageUrl: toPublicUrl(page.imageUrl, "media", env) ?? page.imageUrl,
+    imageKey: objectKey,
+  };
 }

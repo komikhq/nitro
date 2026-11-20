@@ -1,14 +1,16 @@
 import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
+import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { requireAdmin } from "@/server/utils/protect";
 import { deleteComicById } from "@/server/operations/admin";
+import type { StorageEnv } from "@/server/lib/storage";
 
 defineRouteMeta({
   openAPI: {
     tags: ["Administration"],
     operationId: "adminDeleteComic",
     summary: "Delete comic by ID",
-    description: "Permanently deletes a comic record and all its associated chapters. Requires administrator privileges.",
+    description: "Permanently deletes a comic record, cascade deletes chapters/pages, and purges storage assets. Requires administrator privileges.",
     security: [{ SessionCookie: [] }, { BearerToken: [] }],
     parameters: [
       { name: "id", in: "path", required: true, schema: { type: "string" }, description: "Comic ID" },
@@ -45,14 +47,16 @@ export default defineHandler(async (event) => {
   }
 
   const db = useDb(event);
-  const success = await deleteComicById(db, id);
+  const env = useCloudflareEnv(event) as unknown as StorageEnv;
+  const deletedComic = await deleteComicById(db, id, env);
 
-  if (!success) {
+  if (!deletedComic) {
     throw new HTTPError({ status: 404, message: "Comic not found." });
   }
 
   return {
     status: "ok",
-    message: "Comic deleted successfully.",
+    success: true,
+    message: `Comic "${deletedComic.title}" deleted successfully.`,
   };
 });

@@ -1,5 +1,6 @@
 import { comics, comicGenres, type DbClient } from "@/server/db";
 import { eq } from "drizzle-orm";
+import { syncCreator } from "./sync-creator";
 
 export interface UpdateComicParams {
   title?: string;
@@ -12,10 +13,11 @@ export interface UpdateComicParams {
   status?: string;
   accessTier?: string;
   genreIds?: string[];
+  creatorName?: string;
 }
 
 export async function updateComicById(db: DbClient, id: string, params: UpdateComicParams) {
-  const { genreIds, ...updateFields } = params;
+  const { genreIds, creatorName, ...updateFields } = params;
 
   const [comic] = await db
     .update(comics)
@@ -36,6 +38,10 @@ export async function updateComicById(db: DbClient, id: string, params: UpdateCo
         })),
       );
     }
+  }
+
+  if (creatorName !== undefined) {
+    await syncCreator(db, id, creatorName);
   }
 
   return comic;

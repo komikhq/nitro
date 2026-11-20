@@ -1,7 +1,9 @@
 import { defineHandler, defineRouteMeta, HTTPError } from "nitro";
 import { useDb } from "@/server/utils/db";
+import { useCloudflareEnv } from "@/server/utils/cloudflare";
 import { requireAdmin } from "@/server/utils/protect";
 import { deleteChapterById } from "@/server/operations/admin";
+import type { StorageEnv } from "@/server/lib/storage";
 
 defineRouteMeta({
   openAPI: {
@@ -45,14 +47,17 @@ export default defineHandler(async (event) => {
   }
 
   const db = useDb(event);
-  const success = await deleteChapterById(db, id);
+  const env = useCloudflareEnv(event) as unknown as StorageEnv;
+  const deletedChapter = await deleteChapterById(db, id, env);
 
-  if (!success) {
+  if (!deletedChapter) {
     throw new HTTPError({ status: 404, message: "Chapter not found." });
   }
 
   return {
     status: "ok",
-    message: "Chapter deleted successfully.",
+    success: true,
+    message: `Chapter ${deletedChapter.chapterNumber} deleted successfully.`,
+    chapter: deletedChapter,
   };
 });

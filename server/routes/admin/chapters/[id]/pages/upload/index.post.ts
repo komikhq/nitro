@@ -111,7 +111,9 @@ export default defineHandler(async (event) => {
 
     return {
       status: "ok",
+      success: true,
       data: page,
+      page,
     };
   } catch (err: any) {
     if (err.message === "Chapter not found." || err.message === "Parent comic not found.") {

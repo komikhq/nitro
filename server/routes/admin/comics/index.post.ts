@@ -7,6 +7,7 @@ import {
   createComic,
   processComicCover,
   processComicBanner,
+  slugify,
   type CreateComicParams,
 } from "@/server/operations/admin";
 import type { StorageEnv } from "@/server/lib/storage";
@@ -24,11 +25,12 @@ defineRouteMeta({
         "multipart/form-data": {
           schema: {
             type: "object",
-            required: ["title", "slug"],
+            required: ["title"],
             properties: {
               title: { type: "string" },
               slug: { type: "string" },
               synopsis: { type: "string" },
+              creator: { type: "string", description: "Author / creator name" },
               cover: { type: "string", format: "binary", description: "Cover image file" },
               coverUrlSource: { type: "string", description: "External cover image URL to download" },
               coverUrl: { type: "string", description: "Pre-existing storage object key" },
@@ -84,11 +86,13 @@ export default defineHandler(async (event) => {
   if (contentType.includes("multipart/form-data")) {
     const formData = await readFormData(event);
     const title = formData.get("title")?.toString().trim();
-    const slug = formData.get("slug")?.toString().trim();
 
-    if (!title || !slug) {
-      throw new HTTPError({ status: 400, message: "Title and slug are required." });
+    if (!title) {
+      throw new HTTPError({ status: 400, message: "Title is required." });
     }
+
+    const providedSlug = formData.get("slug")?.toString().trim();
+    const slug = providedSlug || `${slugify(title)}-${Date.now().toString().slice(-4)}`;
 
     const coverInput = (formData.get("cover") as File | null) ||
       formData.get("coverUrlSource")?.toString().trim() ||
@@ -111,6 +115,7 @@ export default defineHandler(async (event) => {
     const type = formData.get("type")?.toString() || "manhwa";
     const status = formData.get("status")?.toString() || "ongoing";
     const accessTier = formData.get("accessTier")?.toString() || "free";
+    const creatorName = formData.get("creator")?.toString().trim() || formData.get("creatorName")?.toString().trim() || undefined;
 
     let genreIds: string[] | undefined;
     const rawGenres = formData.get("genreIds")?.toString();
@@ -132,19 +137,27 @@ export default defineHandler(async (event) => {
       status,
       accessTier,
       genreIds,
+      creatorName,
     };
   } else {
-    const body = (await readBody(event)) as CreateComicParams;
-    if (!body?.title || !body?.slug || !body?.coverUrl) {
-      throw new HTTPError({ status: 400, message: "Title, slug, and coverUrl are required." });
+    const body = (await readBody(event)) as any;
+    if (!body?.title) {
+      throw new HTTPError({ status: 400, message: "Title is required." });
     }
-    comicParams = body;
+
+    const slug = body.slug || `${slugify(body.title)}-${Date.now().toString().slice(-4)}`;
+    comicParams = {
+      ...body,
+      slug,
+    };
   }
 
   const comic = await createComic(db, comicParams);
 
   return {
     status: "ok",
+    success: true,
     data: comic,
+    comic,
   };
 });
